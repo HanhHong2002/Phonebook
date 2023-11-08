@@ -3,6 +3,7 @@ package com.example.phonebook
 import ItemAdapter
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -54,23 +55,60 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         menuInflater.inflate(R.menu.sub_menu, menu)
+
+
+
     }
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val pos = (item.menuInfo as AdapterView.AdapterContextMenuInfo).position
-        if (item.itemId == R.id.call)
-            {
-                Log.v("TAG", "Calling..." )
-        }
-            else if (item.itemId == R.id.sms){
-            Log.v("TAG", "Chatting..." )
+        when (item.itemId) {
+            R.id.call -> {
+                call()
+                return true
+            }
+            R.id.sms -> {
+                sendMess()
+                return true
 
             }
-         else if (item.itemId == R.id.mail){
-            Log.v("TAG", "Sending..." )
+            R.id.mail -> {
+                sendEmail()
+                return true
 
+            }
+            else -> return super.onContextItemSelected(item)
+        }
+    }
+    fun sendEmail() {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        val emailAddresses = findViewById<TextView>(R.id.gmail).text.toString()
 
-         }
-        return super.onContextItemSelected(item)
+        intent.putExtra(Intent.EXTRA_EMAIL, emailAddresses)
+        intent.putExtra(Intent.EXTRA_TEXT, "How are you?")
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
+    fun call(){
+        val intent = Intent(Intent.ACTION_DIAL)
+        val selectedPhoneNumber = findViewById<TextView>(R.id.phone).text
+
+        intent.data = Uri.parse("tel:$selectedPhoneNumber")
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+
+    }
+
+    fun sendMess(){
+        val intent = Intent(Intent.ACTION_SENDTO)
+        val selectedPhoneNumber = findViewById<TextView>(R.id.phone).text
+
+        intent.data = Uri.parse("smsto:$selectedPhoneNumber")
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
     }
 
     //
